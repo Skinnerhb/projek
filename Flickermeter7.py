@@ -1,5 +1,4 @@
 import dash
-import dash_auth
 from dash.dependencies import *
 import dash_core_components as dcc
 import dash_html_components as html
@@ -13,8 +12,6 @@ import numpy as np
 import pandas as pd
 import math
 import sqlite3
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 global sens
 sens = pd.DataFrame(columns=['time','temp'])
@@ -191,7 +188,7 @@ def BnD(tsll,start,i,first):
                 #program.setLabel("Bv",round(broadband))
                 #program.setLabel("Tv",round(t))
 
-program = dash.Dash(__name__,external_stylesheet=external_stylesheet)
+program = dash.Dash(__name__)
 program.layout = layoutb
 
 @program.callback(
