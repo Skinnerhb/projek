@@ -1,15 +1,47 @@
 import dash
-from dash.dependencies import Input, Output
+import dash_auth
+from dash.dependencies import *
 import dash_core_components as dcc
 import dash_html_components as html
 from timeit import default_timer as timer
+import plotly.graph_objs as go
 import time
 import board
 import busio
 import adafruit_tsl2561 as tsl
-import numpy
+import numpy as np
+import pandas as pd
 import math
 import sqlite3
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+global sens
+sens = pd.DataFrame(columns=['time','temp'])
+
+#app layout
+def layoutb():
+    layout = html.Div(html.H1('Flickermeter'),
+                      #html.Div(dcc.interval(id='refresh', interval=500)),
+                      #dcc.Input(id='input',value='Enter something', type='text'),
+                      html.Div(id='output')
+                      )
+#sensor graph
+def gplot(sens):
+    plot = dcc.Graph(id = 'preload',
+                     figure={
+                         'data': [go.plot(name='output',
+                                          x=sens['time'],
+                                          y=sens['temp'])],
+                         'layout': go.layout(
+                             title='Broadband (nm)'
+                             )
+                         },
+                     style={
+                         'width':'80%','float':'right'
+                         }
+                     )
+    return plot
 
 #Database connection
 def connection(db):
@@ -26,13 +58,13 @@ def close_con(con):
     con.close()
 
 #main function
-def main():
-    global flag
-    flag = 1
-    check()
+#def main():
+    #global flag
+    #flag = 1
+    #check()
 
 def check():
-    global flag
+    #global flag
     global B
     global T
 
@@ -117,11 +149,11 @@ def saveb(broadband,infrared,t):
 
 #Broadband plot function
 def BnD(tsll,start,i,first):
-    global flag
+    #global flag
     global B
     global T
     #global saver
-    while flag == 1:
+    while True:#flag == 1:
         #get raw (luminosity) readings individually
         broadband = tsll.broadband
         infrared = tsll.infrared
@@ -133,6 +165,7 @@ def BnD(tsll,start,i,first):
         T.append(t)
 
         if i == 10:
+            sens.loc[len(sens)] = [T,B]
             break
         #if saver == 1:
             #saveb(broadband,infrared,t)
@@ -158,29 +191,21 @@ def BnD(tsll,start,i,first):
                 #program.setLabel("Bv",round(broadband))
                 #program.setLabel("Tv",round(t))
 
-program = dash.Dash()
-main()
-
-program.layout = html.Div(children=[
-    html.H1('Flickermeter'),
-    dcc.Input(id='input',value='Enter something', type='text'),
-    html.Div(id='output'),
-    dcc.Graph(id = 'preload',
-              figure={
-                  'data': [
-                      {'x':T, 'y':B, 'type':'line', 'name':'broadband'}
-                      ],
-                  'layout': {
-                      'title':'Broadband (nm)'
-                      }
-                  })
-    ])
+program = dash.Dash(__name__,external_stylesheet=external_stylesheet)
+program.layout = layoutb
 
 @program.callback(
-    Output(component_id='output', component_property='children'),
-    [Input(component_id='input', component_property='value')])
+    Output(component_id='output', component_property='children')
+    )
 def update_value(input_data):
-    return "Input: {}".format(input_data)
+    return gplot(sens)#,
+    #event = [Event(component_id='refresh',component_property='interval')])
+
 
 if __name__ == '__main__':
     program.run_server(debug=True)
+    check()
+
+
+
+    
