@@ -104,6 +104,11 @@ program.layout = html.Div(
                                     ),
                                 dcc.Graph(
                                     id = 'graph-2'
+                                    ),
+                                dcc.Interval(
+                                    id='inter2',
+                                    interval=500,
+                                    n_intervals=0
                                     )
                                 ]
                             ),
@@ -121,6 +126,11 @@ program.layout = html.Div(
                                     ),
                                 dcc.Graph(
                                     id = 'graph-3'
+                                    ),
+                                dcc.Interval(
+                                    id='inter3',
+                                    interval=500,
+                                    n_intervals=0
                                     )
                                 ]
                             ),
@@ -175,29 +185,47 @@ program.layout = html.Div(
                     )
                 ]
             #end sub save division
+            ),
+        html.Div(
+            #start dropdown sub division
+            style={
+                'backgroundColor': colorst['background']
+                },
+            children = [
+                dcc.Dropdown(
+                    id='property',
+                    options=[
+                        {'label':'Broadband (nm)','value':'nm'},
+                        {'label':'Infrared (nm)','value':'inf'},
+                        {'label':'Visible Light (nm)','value':'VL'},
+                        {'label':'Illuminance (lx)','value':'lx'},
+                        {'label':'Flicker Modulation (%)','value':'flicm'},
+                        {'label':'Flicker Index','value':'flici'},
+                        {'label':'Long Term Flicker (%)','value':'Lflic'},
+                        {'label':'Luminous Flux (lm)','value':'lm'},
+                        {'label':'Luminous Intensity (cd)','value':'cd'}
+                        ],
+                    placeholder="Select a property to display"
+                    ),
+                dcc.Interval(
+                    id='inter4',
+                    interval=500,
+                    n_intervals=0
+                    ),
+                html.Label(id = 'prop')
+                ]
+            #end dropdown sub division
             )
         ]
     #end main division
     )
 
 
-##################################################possible extra features
+##############################################possible extra features
 ###dcc.Markdown('''**bold text** and *italics* [links](https://something.com) 'code' snip can write lists, quotes and more''')
-###dcc.Tabs(id ="tabs",value='tab-1',children=[dcc.Tab(label='Tab one',value='tab-1'), dcc.Tab(label='Tan two',value='tab-2')]), htlm.Div(tid='tabs-content')
 ###dcc.ConfirmDialog(id='confirm',message='warning, you sure you want to continue')
 ###dcc.Store(id='my-store', data='my-data':'data') must be used with callbacks
 ###dcc.location(id = 'url', refresh = False) href= "http://127.0.0.1:8050/page-2?a=test#quiz" pathname ="/page2" search ="?a=test" hash="#quiz"
-#html.Label('Select Property'),
-        #dcc.Dropdown(
-        #options=[
-        #{'label':'Broadband (nm)','value':'nm'},
-        #{'label':'Illuminance (lx)','value':'lx'},
-        #{'label':'Flicker (%)','value':'flic'}
-        #],
-        #value=['nm'],
-        #multi=True
-        #),
-
 
 ###html.P('paragraph component')
 ###class is className
@@ -211,11 +239,13 @@ program.layout = html.Div(
 class HaltCallback(Exception):
     pass
 
+#stop server
 @program.server.errorhandler(HaltCallback)
 def handle_error(error):
     print(error, file=sys.stderr)
     return ('', 204)
 
+#save button callback
 @program.callback(
     Output('save_con','children'),
     [Input('Sbut','n_clicks')],
@@ -227,6 +257,83 @@ def upout(n_clicks, value):
         value
         )
 
+#dropdown control
+@program.callback(
+    Output('prop','children'),
+    [Input('property','value')]
+    )
+def update_label(value):
+    A1 = 0
+    A2 = 0
+    Pm = 0
+    Pi = 0
+    broadband = tsll.broadband
+    infrared = tsll.infrared
+    
+    visible_light = broadband - infrared
+    
+    end3 = timer()
+    t3 = end3 - start
+    
+    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+    else:
+        plux = 0
+        
+    T.append(t3)
+    L.append(plux)
+        
+    fm = ((numpy.max(L)-numpy.min(L))/(numpy.max(L)+numpy.min(L)))*100
+    ave = numpy.average(L)
+    for values in range(len(L)-1):
+        xx = T[c+1] - T[c]
+        total += xx*((L[c+1] + L[c])/2)
+        if L[values] > ave:
+            A1 += xx*(((L[c + 1] - ave)+(L[c] - ave))/2)
+        c += 1
+            
+    A2 = total - A1
+    fi = (A1/(A1+A2))
+    FM.append(fm)
+    FI.append(fi)
+    
+    for lf in range(len(FM)-1):
+        Pm += FM[lf-1] ** 3
+        Pi += FI[lf-1] ** 3
+        
+    Pltm = math.pow(Pm/len(FM),1/3)
+    Plti = math.pow(Pi/len(FI),1/3)
+    
+    #cd = lux*(dista**2)
+    #flux = lux*4*math.pi*(radi**2)
+    
+    if value == 'nm':
+        return '{} nm'.format(broadband)
+    elif value == 'inf':
+        return '{} nm'.format(infrared)
+    elif value == 'VL':
+        return '{} nm'.format(visible_light)
+    elif value == 'lx':
+        return '{} lx'.format(plux)
+    elif value == 'flicm':
+        return '{} %'.format(fm)
+    elif value == 'flici':
+        return '{} %'.format(fi)
+    elif value == 'Lflic':
+        return '{} %'.format(pltm)
+    elif value == 'lm':
+        return 'still to come'
+    elif value == 'cd':
+        return 'still to come'
+    
+
+#tab control
 @program.callback(
     Output('tab-stuff','children'),
     [Input('tabbing','value')]
@@ -239,6 +346,7 @@ def showcont(tab):
     elif tab == 'tab-3':
         return
 
+#update broadband graph
 @program.callback(
     Output('graph-1','figure'),
     [Input('inter','n_intervals')]
@@ -250,9 +358,6 @@ def update_graph1(n):
     
     end = timer()
     t = end - start
-    T.append(t)
-    B.append(broadband)
-    I.append(infrared)
 
     data['Broadband'].append(broadband)
     data['Time'].append(t)
@@ -281,118 +386,56 @@ def update_graph1(n):
             }
         }
 
-
-
-
-#######################################################################################################################################################
-##############################################################Sensor functions##################################################################################
-#######################################################################################################################################################
-
-def senseout(start,tsll):
-    end = 0
+#update Illuminance graph
+@program.callback(
+    Output('graph-2','figure'),
+    [Input('inter2','n_intervals')]
+    )
+def update_graph2(n):
+        
     broadband = tsll.broadband
     infrared = tsll.infrared
     
-    #B.append(broadband)
-    #I.append(infrared)
+    end2 = timer()
+    t2 = end2 - start
     
-    #if(infrared/broadband <= 0.50 and infrared/broadband > 0):
-     #   plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
-    #elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
-     #   plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
-    #elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
-     #   plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
-    #elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
-     #   plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
-    #else:
-     #   plux = 0
-        
-    #L.append(plux)
+    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+    else:
+        plux = 0
+
+    data['Illuminance'].append(plux)
+    data['Time2'].append(t2)
     
-    #time program
-    end = timer()
-    t = end - start
-    #T.append(t)
-    return broadband,t
-    
-    #fm = ((numpy.max(L)-numpy.min(L))/(numpy.max(L)+numpy.min(L)))*100
-    #ave = numpy.average(L)
-    #for values in range(len(L)-1):
-     #   xx = T[c+1] - T[c]
-      #  total += xx*((L[c+1] + L[c])/2)
-       # if values > ave:
-        #    A1 += xx*(((L[c + 1] - ave)+(L[c] - ave))/2)
-        #c += 1
-            
-    #A2 = total - A1
-    #fi = (A1/(A1+A2))
-    #FM.append(fm/100)
-    #FI.append(fi)
-    #ss += 1
-    
-    #if ss == 12:
-     #   for lf in range(1,12):
-      #      Pm += FM[lf-1] ** 3
-       #     Pi += FI[lf-1] ** 3
-            
-        #Pltm = math.pow(Pm/12,1/3)
-        #Plti = math.pow(Pi/12,1/3)
-        #ss = 0
-    
-def check():
-
-    #create the i2c bus
-    i2c = busio.I2C(board.SCL, board.SDA)
-
-    #create TSL2561 instance, passing in the I2C bus
-    tsll = tsl.TSL2561(i2c)
-
-    #print chip info:
-    print("Chip ID = {}".format(tsll.chip_id))
-    print("Enabled = {}".format(tsll.enabled))
-    print("Gain = {}".format(tsll.gain))
-    print("Intergration time = {}".format(tsll.integration_time))
-
-    print("Configuring TSL2561....")
-
-    #enable light sensor
-    tsll.enable = True
-    time.sleep(1)
-
-    #set gain 0=1x 1=16x
-    tsll.gain= 0
-
-    #Set integration time (0 = 13.7ms, 1 = 101ms, 2 = 402ms, or 3 = manual)
-    tsll.integration_time = 2
-
-    print("Getting readings...")
-    time.sleep(1)
-
-    B = []
-    I = []
-    L = []
-    #F = []
-    T = []
-
-    #first = 0
-    #i = 0
-    start = timer()
-    
-    #dist = 0
-    #radi = 0
-    
-    #cd = lux*(dista**2)
-    #flux = lux*4*math.pi*(radi**2)
-    for i in range(1,100):
-        [b,t] = senseout(start,tsll)
-        B.append(b)
-        T.append(t)
-    
-    t = 0
-    #disable sensor
-    tsll.enabled=False
-    
-    return B,T
+    return {
+        'data':[{
+            'type':'line',
+            'x':data['Time2'],
+            'y':data['Illuminance']
+            }],
+        'layout':{
+            'xaxis':{
+                'title':'Time (s)',
+                'rangeslider':{
+                    'visible':True
+                    },
+                'autorange': True
+                },
+            'yaxis':{
+                'title':'Illuminance (lx)',
+                'autorange':True    
+                 },
+            'plot_bgcolor':colorst['pbackground'],
+            'paper_bgcolor':colorst['ebackground'],
+            'font':colorst['text']
+            }
+        }
 
 
 #######################################################################################################################################################
@@ -448,15 +491,18 @@ if __name__=='__main__':
     
     start = timer()
     
+    L = []
+    T = []
+    FM = []
+    FI = []
+    
     data = {
         'Broadband': [],
-        'Time': []
-        '': []
+        'Time': [],
+        'Time2': [],
+        'Illuminance': []
         }
     
-    #data['Broadband'] = deque(maxlen=50)
-    #data['Time'] = deque(maxlen=50)
-    
-    program.run_server(debug=True, use_reloader=False)#, dev_tools_ui=True, dev_tools_props_check=False)#, use_reloader=False)
+    program.run_server(debug=True, use_reloader=False)#, dev_tools_ui=True, dev_tools_props_check=False)
     
     
