@@ -67,6 +67,7 @@ def LnD(L,T,tsll,start,i,first):
         broadband = tsll.broadband
         infrared = tsll.infrared
         
+        
         if(infrared/broadband <= 0.50 and infrared/broadband > 0):
             plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
         elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
@@ -152,6 +153,8 @@ def BnD(B,T,I,tsll,start,i,first):
         #get raw (luminosity) readings individually
         broadband = tsll.broadband
         infrared = tsll.infrared
+        print(broadband)
+        print(infrared)
         B.append(broadband)
         #time program
         end = timer()
