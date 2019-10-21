@@ -142,25 +142,6 @@ program.layout = html.Div(
             #end tab division
             ),
         html.Div(
-            #start sub flux division
-            style={
-                'backgroundColor': colorst['background']
-                },
-            children=[
-                html.Label('Enter distance from light source to device:'),
-                dcc.Input(
-                    placeholder='In meter',
-                    type='text'
-                    ),
-                html.Label('Enter radius of light'),
-                dcc.Input(
-                    placeholder='In meter',
-                    type='text'
-                    )
-                ]
-            #en sub flux division
-            ),
-        html.Div(
             #start sub save division
             style={
                 'backgroundColor': colorst['background']
@@ -185,6 +166,27 @@ program.layout = html.Div(
                     )
                 ]
             #end sub save division
+            ),
+        html.Div(
+            #start sub flux division
+            style={
+                'backgroundColor': colorst['background']
+                },
+            children=[
+                html.Label('Enter distance from light source to device:'),
+                dcc.Input(
+                    id = 'fli',
+                    placeholder='In meter',
+                    type='text'
+                    ),
+                html.Label('Enter radius of light'),
+                dcc.Input(
+                    id = 'cdi',
+                    placeholder='In meter',
+                    type='text'
+                    )
+                ]
+            #end sub flux division
             ),
         html.Div(
             #start dropdown sub division
@@ -260,13 +262,16 @@ def upout(n_clicks, value):
 #dropdown control
 @program.callback(
     Output('prop','children'),
-    [Input('property','value')]
+    [Input('property','value'),
+    Input('fli','value'),
+    Input('cdi','value')]
     )
-def update_label(value):
+def update_label(value,dist,rad):
     A1 = 0
     A2 = 0
     Pm = 0
     Pi = 0
+    total = 0
     broadband = tsll.broadband
     infrared = tsll.infrared
     
@@ -289,29 +294,31 @@ def update_label(value):
     T.append(t3)
     L.append(plux)
         
-    fm = ((numpy.max(L)-numpy.min(L))/(numpy.max(L)+numpy.min(L)))*100
-    ave = numpy.average(L)
-    for values in range(len(L)-1):
-        xx = T[c+1] - T[c]
-        total += xx*((L[c+1] + L[c])/2)
-        if L[values] > ave:
-            A1 += xx*(((L[c + 1] - ave)+(L[c] - ave))/2)
-        c += 1
-            
-    A2 = total - A1
-    fi = (A1/(A1+A2))
-    FM.append(fm)
-    FI.append(fi)
-    
-    for lf in range(len(FM)-1):
-        Pm += FM[lf-1] ** 3
-        Pi += FI[lf-1] ** 3
+    fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
+    ave = np.average(L)
+    if len(L)>1:
+        for values in range(len(L)-1):
+            xx = T[values+1] - T[values]
+            total += xx*((L[values+1] + L[values])/2)
+            if L[values] > ave:
+                A1 += xx*(((L[values + 1] - ave)+(L[values] - ave))/2)
+                
+        A2 = total - A1
+        fi = (A1/(A1+A2))
+        FM.append(fm/100)
+        FI.append(fi)
         
-    Pltm = math.pow(Pm/len(FM),1/3)
-    Plti = math.pow(Pi/len(FI),1/3)
+        for lf in range(len(FM)):
+            Pm += FM[lf] ** 3
+            Pi += FI[lf] ** 3
+            
+        Pltm = math.pow(Pm/len(FM),1/3)
+        Plti = math.pow(Pi/len(FI),1/3)
     
-    #cd = lux*(dista**2)
-    #flux = lux*4*math.pi*(radi**2)
+    if dist is not None:
+        flux = plux*(float(dist)**2)
+    if rad is not None:
+        cd = plux*4*math.pi*(float(rad)**2)
     
     if value == 'nm':
         return '{} nm'.format(broadband)
@@ -324,13 +331,13 @@ def update_label(value):
     elif value == 'flicm':
         return '{} %'.format(fm)
     elif value == 'flici':
-        return '{} %'.format(fi)
+        return '{} '.format(fi)
     elif value == 'Lflic':
-        return '{} %'.format(pltm)
+        return '{} '.format(Pltm)
     elif value == 'lm':
-        return 'still to come'
+        return '{} '.format(flux)
     elif value == 'cd':
-        return 'still to come'
+        return '{} '.format(cd)
     
 
 #tab control
@@ -354,7 +361,6 @@ def showcont(tab):
 def update_graph1(n):
         
     broadband = tsll.broadband
-    infrared = tsll.infrared
     
     end = timer()
     t = end - start
