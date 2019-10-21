@@ -1,0 +1,16 @@
+body {
+	background-color: lightGray;
+	font-family: sans-serif;
+}
+
+h1, h2, h3 {
+	color:black;
+	text-align: center;
+	font-family: sans-serif
+}
+
+p {
+	text-align: center;
+	color: black;
+	font-family: sans-serif
+}

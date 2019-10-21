@@ -18,25 +18,6 @@ def connection(db):
 #close connection
 def close_con(con):
     con.close()
-
-#fetch user info
-def fetch(con):
-    try:
-        usr = []
-        pas = []
-        ids = []
-        curs = con.cursor()
-        curs.execute("SELECT UserID, Username, Password FROM user")
-        rows = curs.fetchall()
-        for i in rows:
-            if len(i) > 1:
-                ids.append(i[0])
-                usr.append(i[1])
-                pas.append(i[2])
-        return usr, pas, ids
-    except con.Error as e:
-        print(e)
-        close_con(con)
         
 external_stylesheets = ['bWLwgP.css']
 program = dash.Dash(__name__,external_stylesheets = external_stylesheets)
@@ -48,9 +29,14 @@ colorst = {
     'text': '#000000'
     }
 
-program.layout(
+program.layout = (
     #main division start
     html.Div(
+        style ={
+            'textAlign': 'center',
+            'color': colorst['text'],
+            'fontSize':18
+            },
         children=[
             #sub division header start
             html.Div(
@@ -66,21 +52,53 @@ program.layout(
             #sub division header ends
             #sub division login start
             html.Div(
+                style ={
+                    'textAlign': 'center',
+                    'color': colorst['text'],
+                    'fontSize':18
+                    },
                 children=[
-                    html.Label('Username'),
+                    html.Label('Username:'),
                     dcc.Input(
                         id='usrr',
                         placeholder='ex. User1',
                         type='text'
-                        ),
-                    html.Label('Password'),
+                        )
+                    ]
+                ),
+            html.Div(
+                style ={
+                    'textAlign': 'center',
+                    'color': colorst['text'],
+                    'fontSize':18
+                    },
+                children=[
+                    html.Label('Password:'),
                     dcc.Input(
                         id='paas',
                         placeholder='ex. Passy1!word',
-                        type='text'
-                        ),
+                        type='password'
+                        )
+                    ]
+                ),
+            html.Div(
+                style ={
+                    'textAlign': 'center',
+                    'color': colorst['text'],
+                    'fontSize':18
+                    },
+                children=[
                     html.Button('Login',id='log'),
                     html.Button('Register',id='reg'),
+                    ]
+                ),
+            html.Div(
+                style ={
+                    'textAlign': 'center',
+                    'color': colorst['text'],
+                    'fontSize':18
+                    },
+                children=[
                     html.Label(id = 'show')
                     ]
                 )
@@ -99,21 +117,23 @@ program.layout(
      ]
     )
 def log_user(useri,passi,n):
-    if n >= 1:
-        if useri is not None:
+    if n is not None and n >= 1:
+        if useri is not None and passi is not None:
             db = 'Flickermeter.db'
             con = connection(db)
             curs = con.cursor()
-            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password",[useri, passi])
-            if q.fetchone() is not None:
+            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password = ?",[useri, passi])
+            if curs.fetchone() is not None:
                 close_con(con)
-                return useri 
+                return useri
             else:
                 close_con(con)
-                return 'Username or password incorrect'   
+                return 'Username or password incorrect'
+        else:
+            return 'No Username or Password given'
         
 
 if __name__ == '__main__':
-    main()
+    program.run_server(debug=True)
     
 
