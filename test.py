@@ -315,10 +315,16 @@ def update_label(value,dist,rad):
         Pltm = math.pow(Pm/len(FM),1/3)
         Plti = math.pow(Pi/len(FI),1/3)
     
-    if dist is not None:
+    if dist is not None and isinstance(float(dist),str) == False:
         flux = plux*(float(dist)**2)
-    if rad is not None:
+    else:
+        flux = 0
+    
+    
+    if rad is not None and isinstance(float(rad),str) == False:
         cd = plux*4*math.pi*(float(rad)**2)
+    else:
+        cd = 0
     
     if value == 'nm':
         return '{} nm'.format(broadband)
@@ -443,6 +449,59 @@ def update_graph2(n):
             }
         }
 
+#update Flicker graph
+@program.callback(
+    Output('graph-3','figure'),
+    [Input('inter3','n_intervals')]
+    )
+def update_graph3(n):
+        
+    broadband = tsll.broadband
+    infrared = tsll.infrared
+    
+    end4 = timer()
+    t4 = end4 - start
+    
+    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+    else:
+        plux = 0
+    
+    L2.append(plux)
+    fm = ((np.max(L2)-np.min(L2))/(np.max(L2)+np.min(L2)))*100
+    
+    data['Flicker'].append(fm)
+    data['Time3'].append(t4)
+    
+    return {
+        'data':[{
+            'type':'line',
+            'x':data['Time3'],
+            'y':data['Flicker']
+            }],
+        'layout':{
+            'xaxis':{
+                'title':'Time (s)',
+                'rangeslider':{
+                    'visible':True
+                    },
+                'autorange': True
+                },
+            'yaxis':{
+                'title':'Flicker Modulation (%)',
+                'autorange':True    
+                 },
+            'plot_bgcolor':colorst['pbackground'],
+            'paper_bgcolor':colorst['ebackground'],
+            'font':colorst['text']
+            }
+        }
 
 #######################################################################################################################################################
 ##############################################################SQL functions##################################################################################
@@ -498,6 +557,7 @@ if __name__=='__main__':
     start = timer()
     
     L = []
+    L2 = []
     T = []
     FM = []
     FI = []
@@ -506,7 +566,9 @@ if __name__=='__main__':
         'Broadband': [],
         'Time': [],
         'Time2': [],
-        'Illuminance': []
+        'Illuminance': [],
+        'Flicker': [],
+        'Time3': []
         }
     
     program.run_server(debug=True, use_reloader=False)#, dev_tools_ui=True, dev_tools_props_check=False)
