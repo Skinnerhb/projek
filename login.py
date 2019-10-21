@@ -1,5 +1,8 @@
-import flask
-import flask_login
+from flask import Flask
+import dash
+from dash.dependencies import Output, Input, State
+import dash_core_components as dcc
+import dash_html_components as html
 import sqlite3
 
 #Database connection
@@ -34,78 +37,81 @@ def fetch(con):
     except con.Error as e:
         print(e)
         close_con(con)
-
-#main function
-def main():
-    program = flask.Flask(__name__)
-    program.secret_key = 'Her!9931124'
-
-    logman = flask_login.LoginManager()
-    logman.init_app(program)
-    
-    db = 'Flickermeter.db'
-    con = connection(db)
-    [usr, pas, ids] = fetch(con)
-    close_con(con)
-
-    class User(flask_login.UserMixin):
-        id = ids
-        username = usr
-
-    @logman.user_loader
-    def usrload(usern):
-        if usern not in usr:
-            return
-
-        user = User()
-        user.id = usern
-        return user    
-    
-    @logman.request_loader
-    def reqload(req):
-        usern = req.form.get('email')
-        if usern not in usr:
-            return
-
-        user = User()
-        user.id = usern
-
-        user.is_authenticated = req.form['password'] == pas
-
-        return user
-
-    @program.route('/login', methods=['GET', 'POST'])
-    def login():
-        if flask.request.method == 'GET':
-            return '''
-                   <form action='login' method='POST'>
-                   <input type='text' name='email' id='email' placeholder='email'/>
-                   <input type='password' name='password' id='password' placeholder='password'/>
-                   <input type='submit' name='submit'/>
-                   <form/>
-                   '''
-        usern = flask.request.form['email']
-        if flask.request.form['password'] == pas:
-            user = User()
-            user.id = usern
-            flask_login.login_user(user)
-            return flask.redirect(flask.url_for('protected'))
         
-        return 'Bad Login'
-    
-    @program.route('/protected')
-    @flask_login.login_required
-    def protected():
-        return 'Logged in as: ' + flask_login.current_user.id
+external_stylesheets = ['bWLwgP.css']
+program = dash.Dash(__name__,external_stylesheets = external_stylesheets)
 
-    @program.route('/logout')
-    def logout():
-        flask_login.logout_user()
-        return 'Logged out'
+colorst = {
+    'background':'#b3c4c4',
+    'pbackground':'#ffffff',
+    'ebackground':'#f2f2f2',
+    'text': '#000000'
+    }
 
-    @logman.unauthorized_handler
-    def unauthorized_handler():
-        return 'Unauthorized'
+program.layout(
+    #main division start
+    html.Div(
+        children=[
+            #sub division header start
+            html.Div(
+                children=[
+                    html.H1(children= 'Log in or Register',
+                        style ={
+                            'textAlign': 'center',
+                            'color': colorst['text']
+                            }
+                        ),
+                    ]
+                ),
+            #sub division header ends
+            #sub division login start
+            html.Div(
+                children=[
+                    html.Label('Username'),
+                    dcc.Input(
+                        id='usrr',
+                        placeholder='ex. User1',
+                        type='text'
+                        ),
+                    html.Label('Password'),
+                    dcc.Input(
+                        id='paas',
+                        placeholder='ex. Passy1!word',
+                        type='text'
+                        ),
+                    html.Button('Login',id='log'),
+                    html.Button('Register',id='reg'),
+                    html.Label(id = 'show')
+                    ]
+                )
+            #sub division login ends
+            
+            ]
+        )
+    #end main division
+    )
+
+@program.callback(
+    Output('show','children'),
+    [Input('usrr','value'),
+     Input('paas','value'),
+     Input('log','n_clicks')
+     ]
+    )
+def log_user(useri,passi,n):
+    if n >= 1:
+        if useri is not None:
+            db = 'Flickermeter.db'
+            con = connection(db)
+            curs = con.cursor()
+            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password",[useri, passi])
+            if q.fetchone() is not None:
+                close_con(con)
+                return useri 
+            else:
+                close_con(con)
+                return 'Username or password incorrect'   
+        
 
 if __name__ == '__main__':
     main()
