@@ -1,26 +1,5 @@
-from flask import Flask
-import dash
-from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
-import sqlite3
-
-#Database connection
-def connection(db):
-    con = None
-    try:
-        con = sqlite3.connect(db)
-    except con.Error as e:
-        print(e)
-    
-    return con
-
-#close connection
-def close_con(con):
-    con.close()
-        
-external_stylesheets = ['bWLwgP.css']
-program = dash.Dash(__name__,external_stylesheets = external_stylesheets)
 
 colorst = {
     'background':'#b3c4c4',
@@ -29,9 +8,9 @@ colorst = {
     'text': '#000000'
     }
 
-program.layout = (
-    #main division start
+layout1 = html.Div([
     html.Div(
+        id = 'loginlayout',
         style ={
             'textAlign': 'center',
             'color': colorst['text'],
@@ -88,68 +67,46 @@ program.layout = (
                     'fontSize':18
                     },
                 children=[
-                    html.Button('Login',id='log'),
-                    html.Button('Register',id='reg'),
+                    dcc.Link(
+                        html.Button('Login',id='log'),
+                        href = '/api/Main',
+                        id = 'logmain'
+                        ),
+                    dcc.Link(
+                        html.Button('Register',id='reg'),
+                        href = '/api/register',
+                        id = 'logreg'
+                        ),
                     dcc.Interval(
                         id='intervl',
-                        interval=500,
+                        interval=2000,
                         n_intervals=0
                         )
                     ]
                 ),
             html.Div(
-                style ={
-                    'textAlign': 'center',
-                    'color': colorst['text'],
-                    'fontSize':18
-                    },
-                children=[
-                    html.Label(id = 'show')
-                    ]
+                id = 'show'
                 )
             #sub division login ends
-            
             ]
         )
-    #end main division
-    )
+    ])
 
-@program.callback(
-    Output('show','children'),
-    [Input('usrr','value'),
-     Input('paas','value'),
-     Input('log','n_clicks')
-     ]
-    )
-def log_user(useri,passi,n):
-    clicker - 0
-    if n != 0:
-        clicker = 1
-    
-    if clicker == 1:
-        if useri is not None and passi is not None:
-            db = 'Flickermeter.db'
-            con = connection(db)
-            curs = con.cursor()
-            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password = ?",(useri, passi))
-            if curs.fetchone() is not None:
-                close_con(con)
-                clicker = 0
-                return useri
-            else:
-                close_con(con)
-                return 'Username or password incorrect'
-        else:
-            return 'No Username or Password given'
-
-@program.callback(
-    Output('log','n_clicks'),
-    [Input('intervl','n_intervals')]
-    )
-def resets(nil):
-    return 0
-
-if __name__ == '__main__':
-    program.run_server(debug=True,use_reloader=False)
-    
+layout2 = html.Div([
+    html.Div('App 2'),
+    dcc.Dropdown(
+        id = 'drop2',
+        options = [
+            {'label':'App 2 - {}'.format(i),'value':i} for i in [
+                'NYC','MTL','LA'
+                ]
+            ]
+        ),
+    html.Div(id='app-2'),
+    dcc.Link(
+        html.Button('Go1',id = 'app2b'),
+        href='/api/api1',
+        id='app2'
+        )
+    ])
 
