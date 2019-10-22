@@ -90,6 +90,11 @@ program.layout = (
                 children=[
                     html.Button('Login',id='log'),
                     html.Button('Register',id='reg'),
+                    dcc.Interval(
+                        id='intervl',
+                        interval=500,
+                        n_intervals=0
+                        )
                     ]
                 ),
             html.Div(
@@ -117,23 +122,34 @@ program.layout = (
      ]
     )
 def log_user(useri,passi,n):
-    if n is not None and n >= 1:
+    clicker - 0
+    if n != 0:
+        clicker = 1
+    
+    if clicker == 1:
         if useri is not None and passi is not None:
             db = 'Flickermeter.db'
             con = connection(db)
             curs = con.cursor()
-            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password = ?",[useri, passi])
+            curs.execute("SELECT 1 FROM user WHERE Username = ? AND Password = ?",(useri, passi))
             if curs.fetchone() is not None:
                 close_con(con)
+                clicker = 0
                 return useri
             else:
                 close_con(con)
                 return 'Username or password incorrect'
         else:
             return 'No Username or Password given'
-        
+
+@program.callback(
+    Output('log','n_clicks'),
+    [Input('intervl','n_intervals')]
+    )
+def resets(nil):
+    return 0
 
 if __name__ == '__main__':
-    program.run_server(debug=True)
+    program.run_server(debug=True,use_reloader=False)
     
 
