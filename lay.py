@@ -78,11 +78,6 @@ layout1 = html.Div([
                         html.Button('Register',id='reg'),
                         href = '/api/register',
                         id = 'logreg'
-                        ),
-                    dcc.Interval(
-                        id='intervl',
-                        interval=2000,
-                        n_intervals=0
                         )
                     ]
                 ),

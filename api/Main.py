@@ -20,6 +20,7 @@ import sqlite3
 from collections import deque
 from Program import program
 from connect import connection, close_con
+import Adafruit_ADS1x15
 
 #######################################################################################################################################################
 ##############################################################Initialize Program##################################################################################
@@ -41,7 +42,7 @@ colorst = {
 ##############################################################Program Layout##################################################################################
 #######################################################################################################################################################
 
-layout = html.Div(
+program.layout = html.Div(
     #head division
     children=[
         html.Div(
@@ -56,7 +57,11 @@ layout = html.Div(
                         ),
                 html.Div(children = '''
                     This aplicaton analyses light input through the use of a TSL2561 and a TSL257, input is analysed with the use of dash and python, through Raspberry Pi.
-                    '''
+                    ''',
+                         style ={
+                            'textFont': '18',
+                            'color': colorst['text']
+                            }
                          ),
                 ]
             ),
@@ -211,7 +216,7 @@ layout = html.Div(
                     ),
                 dcc.Interval(
                     id='inter4',
-                    interval=500,
+                    interval=1.17,
                     n_intervals=0
                     ),
                 html.Label(id = 'prop')
@@ -456,22 +461,10 @@ def update_graph2(n):
     )
 def update_graph3(n):
         
-    broadband = tsll.broadband
-    infrared = tsll.infrared
+    plux = adc.read_adc(0, gain=GAIN)
     
     end4 = timer()
     t4 = end4 - start
-    
-    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
-        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
-    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
-        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
-    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
-        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
-    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
-        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
-    else:
-        plux = 0
     
     L2.append(plux)
     fm = ((np.max(L2)-np.min(L2))/(np.max(L2)+np.min(L2)))*100
@@ -525,7 +518,7 @@ def save(broadband,infrared,plux,fm,fi,t):
 
 ###x = threading.Thread(target=thread_function,args(1,))
 ###x.start()
-def start():
+if __name__ == '__main__':
     #create the i2c bus
     i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -560,6 +553,9 @@ def start():
     T = []
     FM = []
     FI = []
+    
+    adc = Adafruit_ADS1x15.ADS1115()
+    GAIN = 8
 
     data = {
         'Broadband': [],
@@ -570,5 +566,6 @@ def start():
         'Time3': []
         }
     
-    return start, L, L2, T, FM, FI, data
+    program.run_server(debug=True)
+
     

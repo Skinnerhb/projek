@@ -4,19 +4,12 @@ from connect import connection, close_con
 from Program import program
 
 @program.callback(
-    Output('patherr','children'),
-    [Input('url','pathname'),
-     Input('hideme1','value')]
+    Output('url','pathname'),
+    [Input('hideme2','value')]
     )
-def caller(pathname,value):
-    if pathname == '/api/login':
-        return layout1
-    elif hideme == 'confirmed' and pathname == '/api/Main':
-        return layout2
-    elif hideme == 'register' and pathname == '/api/register':
-        return layout3
-    else:
-        return '404 Page not found'
+def resets(value):
+    if value == 'deselect':
+        return '/api/login'
 
 @program.callback(
     [Output('show','children'),
@@ -37,31 +30,13 @@ def log_user(useri,passi,pathname):
             curs.execute("SELECT 1 FROM User WHERE Username = ? AND Password = ?",(useri, passi))
             if curs.fetchone() is not None:
                 close_con(con)
-                return ['Logging in', 'confirmed','select']
+                return 'Logging in', 'confirmed','select'
             else:
                 close_con(con)
-                return ['Username or password incorrect', 'not','deselect']
+                return 'Username or password incorrect', 'not', 'deselect'
         else:
-            return ['No Username or Password given', 'not','deselect']
+            return 'No Username or Password given', 'not', 'deselect'
 
-@program.callback(
-    Output('url','pathname'),
-    [Input('intervl','n_intervals'),
-     Input('hideme2','value')
-     ]
-    )
-def resets(nil,value):
-    if value == 'deselect':
-        return '/api/login'
-
-class HaltCallback(Exception):
-    pass
-
-#stop server
-@program.server.errorhandler(HaltCallback)
-def handle_error(error):
-    print(error, file=sys.stderr)
-    return ('', 204)
 
 #save button callback
 @program.callback(

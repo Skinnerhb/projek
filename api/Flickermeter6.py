@@ -28,13 +28,15 @@ def getLT(L,T):
     i = 0
     j = 0
     if len(L) >= 5 and len(L) < 50:
-        for i in range(5,len(L)-1):
-            l.append(L[i])
-            t3.append(T[i])
+        for i in range(len(L)):
+            if i >= 4:
+                l.append(L[i])
+                t3.append(T[i])
     elif len(L) >= 50:
-        for j in range(len(L)-51,len(L)-1):
-            l.append(L[j])
-            t3.append(T[j])
+        for j in range(len(L)):
+            if j >= 49:
+                l.append(L[j])
+                t3.append(T[j])
     return t3,l
             
 #Illumanance plot labels
@@ -42,7 +44,7 @@ def Llabels(axes):
     axes.title.set_text("Illuminance measurement")
     axes.set_xlabel("Time (s)")
     axes.set_ylabel("Illuminance (Lux)")
-    program.refreshPlot("p")
+    program.refreshPlot("pl")
 
 #Illuminance save database
 def savel(broadband,infrared,plux,t):
@@ -90,7 +92,7 @@ def LnD(L,T,tsll,start,i,first):
         if saver == 1:
             savel(broadband,infrared,plux,t)
         
-        if i >= 7:
+        if i >= 5:
             print("enter")
             if first == 0:
                 program.setLabel("Lnn","Iluminance (lux):")
@@ -99,11 +101,11 @@ def LnD(L,T,tsll,start,i,first):
                 program.setLabel("Bv",round(broadband))
                 program.setLabel("Tn","Time (s):")
                 program.setLabel("Tv",round(t))
-                ax2 = program.updatePlot("p", *getLT(L,T))
+                ax2 = program.updatePlot("pl", *getLT(L,T))
                 Llabels(ax2)
                 first = 1
             else:
-                ax2 = program.updatePlot("p",*getLT(L,T),keepLabels=True)
+                ax2 = program.updatePlot("pl",*getLT(L,T),keepLabels=True)
                 program.setLabel("Lv",round(plux))
                 program.setLabel("Bv",round(broadband))
                 program.setLabel("Tv",round(t))
@@ -129,7 +131,7 @@ def Blabels(axes):
     axes.title.set_text("Broadband measurement")
     axes.set_xlabel("Time (s)")
     axes.set_ylabel("Wavelength (nm)")
-    program.refreshPlot("p")
+    program.refreshPlot("pl")
 
 #Broadband save database
 def saveb(broadband,infrared,t):
@@ -169,7 +171,7 @@ def BnD(B,T,I,tsll,start,i,first):
             i = 0
             if first == 0:
                 [tempx, tempy] = getBT(B,T)
-                ax2 = program.updatePlot("p", list(tempx),list(tempy))
+                ax2 = program.updatePlot("pl", list(tempx),list(tempy))
                 Blabels(ax2)
                 program.setLabel("Lnn","Infrared (nm):")
                 program.setLabel("Lv",round(infrared))
@@ -180,7 +182,7 @@ def BnD(B,T,I,tsll,start,i,first):
                 first = 1
             else:
                 [tempx,tempy] = getBT(B,T)
-                ax2 = program.updatePlot("p", *getBT(B,T),keepLabels = True)
+                ax2 = program.updatePlot("pl", *getBT(B,T),keepLabels = True)
                 program.setLabel("Lv",round(infrared))
                 program.setLabel("Bv",round(broadband))
                 program.setLabel("Tv",round(t))
@@ -206,7 +208,7 @@ def Flabels(axes):
     axes.title.set_text("Flicker measurement")
     axes.set_xlabel("Time (s)")
     axes.set_ylabel("Illuminance (lux)")
-    program.refreshPlot,"p"
+    program.refreshPlot,"pl"
 
 #Flicker save database
 def savef(broadband,infrared,plux,fm,fi,Pltm,Plti,t):
@@ -268,7 +270,7 @@ def FnD(F,T,tsll,start,i,first):
             print("enter")
             i = 0
             if first == 0:
-                ax2 = program.updatePlot("p",*getFT(F,T))
+                ax2 = program.updatePlot("pl",*getFT(F,T))
                 Flabels(ax2)
                 program.setLabel("Lnn","Illumance (lux):")
                 program.setLabel("Lv",round(plux))
@@ -278,7 +280,7 @@ def FnD(F,T,tsll,start,i,first):
                 program.setLabel("Tv",round(t))
                 first = 1
             else:
-                ax2 = program.updatePlot("p", *getFT(F,T),keepLabels = True)
+                ax2 = program.updatePlot("pl", *getFT(F,T),keepLabels = True)
                 program.setLabel("Lv",round(plux))
                 program.setLabel("Bv",round(broadband))
                 program.setLabel("Tv",round(t))
@@ -363,7 +365,7 @@ def FLnD(F,T,tsll,start,i,first):
             print("enter")
             i = 0
             if first == 0:
-                ax2 = program.updatePlot("p",*getFT(F,T))
+                ax2 = program.updatePlot("pl",*getFT(F,T))
                 Flabels(ax2)
                 program.setLabel("Lnn","Illumance (lux):")
                 program.setLabel("Lv",round(plux))
@@ -373,7 +375,7 @@ def FLnD(F,T,tsll,start,i,first):
                 program.setLabel("Tv",round(t))
                 first = 1
             else:
-                ax2 = program.updatePlot("p", *getFT(F,T),keepLabels = True)
+                ax2 = program.updatePlot("pl", *getFT(F,T),keepLabels = True)
                 program.setLabel("Lv",round(plux))
                 program.setLabel("Bv",round(broadband))
                 program.setLabel("Tv",round(t))
@@ -644,7 +646,7 @@ program.setButtonFont(size = 16, family = "Verdana")
 
 program.setStretch("both")
 program.setSticky("news")
-program.addPlot("p",1,1,showNav = True,row=3,column=0,rowspan=7,colspan=4)
+program.addPlot("pl",1,1,showNav = True,row=3,column=0,rowspan=7,colspan=4)
 
 def connection(db):
     con = None
@@ -739,7 +741,7 @@ program.addLabel("titles", "Welcome! please login to continue")
 program.setLabelFont("titles",size = 16, family = "Verdana")
 program.setLabelBg("titles", "cyan")
 program.setLabelFg("titles","red")
-program.setBg("blue")
+program.setBg("lightgray")
 program.addLabelEntry("Username")
 program.setEntryMaxLength("Username",20)
 program.addLabelSecretEntry("Password")
@@ -884,7 +886,7 @@ program.stopSubWindow()
 
 #Register Window
 program.startSubWindow("two",title = "Register",modal = True)
-program.setBg("blue")
+program.setBg("lightgray")
 program.addLabelEntry("Enter Username")
 program.setEntryMaxLength("Enter Username",20)
 program.addLabelEntry("Enter Name")
