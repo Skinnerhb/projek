@@ -1,0 +1,74 @@
+
+//base.html
+<script>
+		$(document).ready(function(){
+			{% block jquery %}
+				var output = '/api/chart/data/'
+				var trueData = []
+				var labels = []
+				$.ajax({
+					method:"GET",
+					url: output,
+					success: function(get_data){
+						labels= get_data.labels
+						trueData = get_data.truer;
+						var mine = document.getElementById('FlickerChart');
+						var FlickerChart = new Chart(mine, {
+							type:'line',
+							data: {
+								labels: labels,
+								datasets: [{
+									label: 'Flicker Modulation %',
+									data: trueData,
+									backgroundColor: [
+										'rgba(54,162,235,0.2)',
+										],
+									borderColor: [
+										'rgba(54,162,235,1)',
+										],
+									borderWidth: 1
+									}]
+								},
+							options: {
+								scales: {
+									yAxes: [{
+										ticks: {
+											beginAtZero: true
+											}
+										}]
+									}
+								}
+							});
+						},
+					error: function(errord){
+						console.log("error")
+						console.log(errord)
+						}
+					})
+	
+	
+			{% endblock %}
+		})
+	</script>
+
+//main.html
+<canvas id="FlickerChart"></canvas>
+
+//Flickermeter.views.py
+class ChartingData(APIView):
+    authentication_classes = []
+    permission_classes = []
+    
+    def get(self, request, format=None):
+        labels = ["Red","Blue","Yellow","Green","Purple","Orange"]
+        truers = [50,20,30,40,10,5]
+        data = {
+            "labels":labels,
+            "truer":truers,
+            }
+        return Response(data)
+
+//Flickermeter.urls.py
+from .views import ChartingData
+
+url(r'^api/chart/data/$',ChartingData.as_view(), name='flickerchart-data'),

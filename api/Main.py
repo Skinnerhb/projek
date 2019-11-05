@@ -6,10 +6,9 @@ import dash
 from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
 import plotly.graph_objs as go
 import threading
-import numpy as np
+#import numpy as np
 import board
 import busio
 import adafruit_tsl2561 as tsl
@@ -37,6 +36,122 @@ colorst = {
 #Y = deque(maxlen=50)
 #X.append(1)
 #Y.append(1)
+
+
+
+def getData():
+    #create the i2c bus
+    i2c = busio.I2C(board.SCL, board.SDA)
+
+    #create TSL2561 instance, passing in the I2C bus
+    tsll = tsl.TSL2561(i2c)
+
+    #print chip info:
+    print("Chip ID = {}".format(tsll.chip_id))
+    print("Enabled = {}".format(tsll.enabled))
+    print("Gain = {}".format(tsll.gain))
+    print("Intergration time = {}".format(tsll.integration_time))
+
+    print("Configuring TSL2561....")
+
+    #enable light sensor
+    tsll.enable = True
+    time.sleep(1)
+
+    #set gain 0=1x 1=16x
+    tsll.gain= 0
+
+    #Set integration time (0 = 13.7ms, 1 = 101ms, 2 = 402ms, or 3 = manual)
+    tsll.integration_time = 2
+
+    print("Getting readings...")
+    time.sleep(1)
+
+    start = timer()
+
+    L = []
+    L2 = []
+    T = []
+    FM = []
+    FI = []
+    
+    fi = 0
+    fm = 0
+    adc = Adafruit_ADS1x15.ADS1115()
+    GAIN = 8
+
+    #data = {
+        #'Broadband': [],
+      #  'Time': [],
+      #  'Time2': [],
+       # 'Illuminance': [],
+       # 'Flicker': [],
+      #  'Time3': []
+      #  }
+    
+    A1 = 0
+    A2 = 0
+    Pm = 0
+    Pi = 0
+    total = 0
+    broadband = tsll.broadband
+    infrared = tsll.infrared
+    
+    visible_light = broadband - infrared
+    
+    end3 = timer()
+    t3 = end3 - start
+    
+    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+    else:
+        plux = 0
+        
+    T.append(t3)
+    
+    
+    slux = adc.read_adc(0, gain=GAIN)
+    L.append(slux)
+    fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
+    ave = np.average(L)
+    if len(L)>1:
+        for values in range(len(L)-1):
+            xx = T[values+1] - T[values]
+            checkers = (L[values + 1]+L[values])/2
+            total += xx*(checkers)
+            if checkers > ave:
+                A1 += xx*((checkers)-ave)
+                
+        A2 = total - A1
+        fi = (A1/(A1+A2))
+        FM.append(fm)
+        FI.append(fi)
+        
+        for lf in range(len(FM)):
+            Pm += FM[lf] ** 3
+            Pi += FI[lf] ** 3
+            
+        Pltm = math.pow(Pm/len(FM),1/3)
+        Plti = math.pow(Pi/len(FI),1/3)
+    
+    if dist is not None and isinstance(float(dist),str) == False:
+        flux = plux*(float(dist)**2)
+    else:
+        #flux = 0
+        flux = plux*(0.5**2)
+    
+    
+    if rad is not None and isinstance(float(rad),str) == False:
+        cd = plux*4*math.pi*(float(rad)**2)
+    else:
+        #cd = 0
+        cd = plux*4*math.pi*(0.2**2)
 
 #######################################################################################################################################################
 ##############################################################Program Layout##################################################################################
@@ -272,64 +387,10 @@ def upout(n_clicks, value):
     Input('cdi','value')]
     )
 def update_label(value,dist,rad):
-    A1 = 0
-    A2 = 0
-    Pm = 0
-    Pi = 0
-    total = 0
-    broadband = tsll.broadband
-    infrared = tsll.infrared
-    
-    visible_light = broadband - infrared
-    
-    end3 = timer()
-    t3 = end3 - start
-    
-    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
-        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
-    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
-        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
-    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
-        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
-    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
-        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
-    else:
-        plux = 0
-        
-    T.append(t3)
-    L.append(plux)
-        
-    fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
-    ave = np.average(L)
-    if len(L)>1:
-        for values in range(len(L)-1):
-            xx = T[values+1] - T[values]
-            total += xx*((L[values+1] + L[values])/2)
-            if L[values] > ave:
-                A1 += xx*(((L[values + 1] - ave)+(L[values] - ave))/2)
-                
-        A2 = total - A1
-        fi = (A1/(A1+A2))
-        FM.append(fm/100)
-        FI.append(fi)
-        
-        for lf in range(len(FM)):
-            Pm += FM[lf] ** 3
-            Pi += FI[lf] ** 3
-            
-        Pltm = math.pow(Pm/len(FM),1/3)
-        Plti = math.pow(Pi/len(FI),1/3)
-    
-    if dist is not None and isinstance(float(dist),str) == False:
-        flux = plux*(float(dist)**2)
-    else:
-        flux = 0
     
     
-    if rad is not None and isinstance(float(rad),str) == False:
-        cd = plux*4*math.pi*(float(rad)**2)
-    else:
-        cd = 0
+    if len(L) > 1: 
+        save(broadband,infrared,visible_light,plux,fm,fi,Pltm,Plti,flux, cd,t3)
     
     if value == 'nm':
         return '{} nm'.format(broadband)
@@ -460,17 +521,80 @@ def update_graph2(n):
     [Input('inter3','n_intervals')]
     )
 def update_graph3(n):
+    A1 = 0
+    A2 = 0
+    Pm = 0
+    Pi = 0
+    total = 0
+    broadband = tsll.broadband
+    infrared = tsll.infrared
+    
+    visible_light = broadband - infrared
+    
+    end3 = timer()
+    t3 = end3 - start
+    
+    if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+        plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+    elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+        plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+        plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+    elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+        plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+    else:
+        plux = 0
         
-    plux = adc.read_adc(0, gain=GAIN)
+    T.append(t3)
     
-    end4 = timer()
-    t4 = end4 - start
     
-    L2.append(plux)
-    fm = ((np.max(L2)-np.min(L2))/(np.max(L2)+np.min(L2)))*100
+    slux = adc.read_adc(0, gain=GAIN)
+    L.append(slux)
+    fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
+    ave = np.average(L)
+    if len(L)>1:
+        for values in range(len(L)-1):
+            xx = T[values+1] - T[values]
+            checkers = (L[values + 1]+L[values])/2
+            total += xx*(checkers)
+            if checkers > ave:
+                A1 += xx*((checkers)-ave)
+                
+        A2 = total - A1
+        fi = (A1/(A1+A2))
+        FM.append(fm)
+        FI.append(fi)
+        
+        for lf in range(len(FM)):
+            Pm += FM[lf] ** 3
+            Pi += FI[lf] ** 3
+            
+        Pltm = math.pow(Pm/len(FM),1/3)
+        Plti = math.pow(Pi/len(FI),1/3)
+    
+    cd = plux*(0.5**2)
+    
+    ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+    
+    flux = cd*ster
+    
+    if len(L) > 1:
+        f = open("Data.txt","a")
+        f.write("LED_8.5W_806lm_95lm/W_Yellow_PHILIPS_68ma_UnderLoad,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d \n"% (broadband,infrared,visible_light,plux,fm,fi,Pltm,Plti,flux, cd,t3))
+        
+        #save(broadband,infrared,visible_light,plux,fm,fi,Pltm,Plti,flux, cd,t3)
+    
+    
+    #plux = adc.read_adc(0, gain=GAIN)
+    
+    #end4 = timer()
+    #t4 = end4 - start
+    
+    #L2.append(plux)
+    #fm = ((np.max(L2)-np.min(L2))/(np.max(L2)+np.min(L2)))*100
     
     data['Flicker'].append(fm)
-    data['Time3'].append(t4)
+    data['Time3'].append(t3)
     
     return {
         'data':[{
@@ -500,12 +624,12 @@ def update_graph3(n):
 ##############################################################SQL functions##################################################################################
 #######################################################################################################################################################
 
-def save(broadband,infrared,plux,fm,fi,t):
-    con = connection('Flickermeter.db')
+def save(broadband,infrared,VisibleLight,plux,fm,fi,pm,pi,flux, inten,t):
+    con = connection('Light_test.db')
     q = con.cursor()
     try:
-        query = "INSERT INTO Data (LightID,Broadband,Infrared,Illuminance,Time) VALUES (?,?,?,?,?);"
-        q.execute(query, (lit,broadband,infrared,plux,t))
+        query = "INSERT INTO Lights (Light_Type, Broadband, Infrared, Visible_Light, Illuminance, Flicker_Modulation, Flicker_Index, Long_Modulation, Long_Index, Flux, Intensity, Time)) VALUES ('LED',?,?,?,?,?,?,?,?,?,?,?);"
+        q.execute(query, (broadband,infrared,VisibleLight,plux,fm,fi,pm, pi,flux, inten,t))
         con.commit()
         close_con(con)
     except con.Error as e:
@@ -554,17 +678,19 @@ if __name__ == '__main__':
     FM = []
     FI = []
     
+    fi = 0
+    fm = 0
     adc = Adafruit_ADS1x15.ADS1115()
     GAIN = 8
 
-    data = {
-        'Broadband': [],
-        'Time': [],
-        'Time2': [],
-        'Illuminance': [],
-        'Flicker': [],
-        'Time3': []
-        }
+    #data = {
+        #'Broadband': [],
+      #  'Time': [],
+      #  'Time2': [],
+       # 'Illuminance': [],
+       # 'Flicker': [],
+      #  'Time3': []
+      #  }
     
     program.run_server(debug=True)
 

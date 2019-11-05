@@ -1,0 +1,62 @@
+h1 {
+	color:black;
+	font-size: 40px;
+}
+
+p {
+	color:black;
+	font-size: 24px;
+}
+
+body {
+	background-color:lightgray;
+}
+
+#navbar {
+	background-color:rgb(159, 213, 200);
+	color:black;
+	text-align:center;
+	position: relative;
+}
+
+#inbut {
+	text-align:center;
+	font-size: 24px;
+	border-style: solid;
+	border-width: 15px;
+	border-color: lightblue;
+	display: inline-block;
+	margin-left:40%;
+}
+
+.button {
+	background-color: rgb(159, 213, 200); 
+	border: none;
+	text-align:center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 24px;
+}
+
+#extra {
+	text-align:right;
+}
+
+#new {
+	float:right;
+}
+
+#floater {
+	position:absolute;
+	right:1px;
+	top:1px;
+}
+
+#charter {
+	grid-area: 1 / 1 / span 1 / span 3;
+}
+
+#some {
+	display: grid;
+	grid: 2% / 25% 25% 25% 25%;
+	}

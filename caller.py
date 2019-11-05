@@ -3,13 +3,13 @@ import sqlite3
 from connect import connection, close_con
 from Program import program
 
-@program.callback(
-    Output('url','pathname'),
-    [Input('hideme2','value')]
-    )
-def resets(value):
-    if value == 'deselect':
-        return '/api/login'
+#@program.callback(
+  #  Output('url','pathname'),
+   # [Input('hideme2','value')]
+   # )
+#def resets(value):
+    #if value == 'deselect':
+        #return '/api/login'
 
 @program.callback(
     [Output('show','children'),
@@ -39,16 +39,16 @@ def log_user(useri,passi,pathname):
 
 
 #save button callback
-@program.callback(
-    Output('save_con','children'),
-    [Input('Sbut','n_clicks')],
-    [State('LID','value')]
-    )
-def upout(n_clicks, value):
-    return 'clicks: {}, ID: "{}"'.format(
-        n_clicks,
-        value
-        )
+#@program.callback(
+    #Output('save_con','children'),
+    #[Input('Sbut','n_clicks')],
+    #[State('LID','value')]
+    #)
+#def upout(n_clicks, value):
+    #return 'clicks: {}, ID: "{}"'.format(
+        #n_clicks,
+        #value
+       # )
 
 #dropdown control
 @program.callback(

@@ -39,14 +39,14 @@ def callert(pathname,value):
     else:
         return layout1
 
-#class HaltCallback(Exception):
-  #  pass
+class HaltCallback(Exception):
+    pass
 
 #stop server
-#@program.server.errorhandler(HaltCallback)
-#def handle_error(error):
-   # print(error, file=sys.stderr)
-   # return ('', 204)
+@program.server.errorhandler(HaltCallback)
+def handle_error(error):
+     print(error, file=sys.stderr)
+     return ('', 204)
 
 if __name__ == '__main__':
     program.run_server(debug=True)

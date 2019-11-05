@@ -1,0 +1,24 @@
+{% extends "Flickermeter/base.html" %}
+{% block content %}
+	<div id="navbar">
+		<h1>Login</h1>
+	</div>
+	<div id="inbut">
+		<form action="/" method="POST">
+			{% csrf_token %}
+			<br>
+			<div id="extra">
+				Username: <input type="text" name="user"><br><br>
+				Password: <input type="password" name="pass"><br><br>
+			</div>
+			<button class = "button" type="submit">Login</button>
+			<input type="button" class="button" onclick="window.location.href='/register'" value="Register"/>
+		</form>
+	</div>
+	<div id="new">
+		{% for message in messages %}
+			<h3> {{ message }} </h3>
+		{% endfor %}
+	</div>
+
+{% endblock content %}
