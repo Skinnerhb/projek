@@ -2,7 +2,7 @@
 ##############################################################Imports##################################################################################
 #######################################################################################################################################################
 import sys
-import dash
+from django_plotly_dash import DjangoDash
 from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -16,14 +16,14 @@ from timeit import default_timer as timer
 import time
 import math
 import sqlite3
-from collections import deque
-from Program import program
-from connect import connection, close_con
+#from collections import deque
 import Adafruit_ADS1x15
 
 #######################################################################################################################################################
 ##############################################################Initialize Program##################################################################################
 #######################################################################################################################################################
+external_stylesheets = ['bWLwgP.css']
+program = DjangoDash('Main',external_stylesheets = external_stylesheets)
 
 colorst = {
     'background':'#b3c4c4',
@@ -37,7 +37,19 @@ colorst = {
 #X.append(1)
 #Y.append(1)
 
+#Database connection
+def connection(db):
+    con = None
+    try:
+        con = sqlite3.connect(db)
+    except con.Error as e:
+        print(e)
+    
+    return con
 
+#close connection
+def close_con(con):
+    con.close()
 
 #######################################################################################################################################################
 ##############################################################Program Layout##################################################################################
@@ -46,27 +58,6 @@ colorst = {
 program.layout = html.Div(
     #head division
     children=[
-        html.Div(
-            #sub division with header and explanation
-            style={'backgroundColor': colorst['background']},
-            children =[
-                html.H1(children= 'Flicker Analyser',
-                        style ={
-                            'textAlign': 'center',
-                            'color': colorst['text']
-                            }
-                        ),
-                html.Div(children = '''
-                    This aplicaton analyses light input through the use of a TSL2561 and a TSL257, input is analysed with the use of dash and python, through Raspberry Pi.
-                    ''',
-                         style ={
-                            'textFont': '18',
-                            'color': colorst['text']
-                            }
-                         ),
-                ]
-            ),
-            #end sub division
         html.Div(
             style={'backgroundColor': colorst['background']},
             #sub division with tabs
@@ -91,7 +82,7 @@ program.layout = html.Div(
                                     ),
                                 dcc.Interval(
                                     id='inter',
-                                    interval=500,
+                                    interval=150,
                                     n_intervals=0
                                     )
                                 ]
@@ -113,7 +104,7 @@ program.layout = html.Div(
                                     ),
                                 dcc.Interval(
                                     id='inter2',
-                                    interval=500,
+                                    interval=150,
                                     n_intervals=0
                                     )
                                 ]
@@ -135,7 +126,7 @@ program.layout = html.Div(
                                     ),
                                 dcc.Interval(
                                     id='inter3',
-                                    interval=500,
+                                    interval=150,
                                     n_intervals=0
                                     )
                                 ]
@@ -217,7 +208,7 @@ program.layout = html.Div(
                     ),
                 dcc.Interval(
                     id='inter4',
-                    interval=1.17,
+                    interval=50,
                     n_intervals=0
                     ),
                 html.Label(id = 'prop')
@@ -243,15 +234,6 @@ program.layout = html.Div(
 #######################################################################################################################################################
 ##############################################################Tab Layout with Callbacks##################################################################################
 #######################################################################################################################################################
-
-class HaltCallback(Exception):
-    pass
-
-#stop server
-@program.server.errorhandler(HaltCallback)
-def handle_error(error):
-    print(error, file=sys.stderr)
-    return ('', 204)
 
 #save button callback
 @program.callback(
@@ -583,54 +565,51 @@ def save(broadband,infrared,VisibleLight,plux,fm,fi,pm,pi,flux, inten,t):
 
 ###x = threading.Thread(target=thread_function,args(1,))
 ###x.start()
-if __name__ == '__main__':
-    #create the i2c bus
-    i2c = busio.I2C(board.SCL, board.SDA)
+#create the i2c bus
+i2c = busio.I2C(board.SCL, board.SDA)
 
-    #create TSL2561 instance, passing in the I2C bus
-    tsll = tsl.TSL2561(i2c)
+#create TSL2561 instance, passing in the I2C bus
+tsll = tsl.TSL2561(i2c)
 
-    #print chip info:
-    print("Chip ID = {}".format(tsll.chip_id))
-    print("Enabled = {}".format(tsll.enabled))
-    print("Gain = {}".format(tsll.gain))
-    print("Intergration time = {}".format(tsll.integration_time))
+#print chip info:
+print("Chip ID = {}".format(tsll.chip_id))
+print("Enabled = {}".format(tsll.enabled))
+print("Gain = {}".format(tsll.gain))
+print("Intergration time = {}".format(tsll.integration_time))
 
-    print("Configuring TSL2561....")
+print("Configuring TSL2561....")
 
-    #enable light sensor
-    tsll.enable = True
-    time.sleep(1)
+#enable light sensor
+tsll.enable = True
+time.sleep(1)
 
-    #set gain 0=1x 1=16x
-    tsll.gain= 0
+#set gain 0=1x 1=16x
+tsll.gain= 0
 
-    #Set integration time (0 = 13.7ms, 1 = 101ms, 2 = 402ms, or 3 = manual)
-    tsll.integration_time = 2
+#Set integration time (0 = 13.7ms, 1 = 101ms, 2 = 402ms, or 3 = manual)
+tsll.integration_time = 2
 
-    print("Getting readings...")
-    time.sleep(1)
+print("Getting readings...")
+time.sleep(1)
 
-    start = timer()
+start = timer()
 
-    L = []
-    L2 = []
-    T = []
-    FM = []
-    FI = []
-    
-    fi = 0
-    fm = 0
-    adc = Adafruit_ADS1x15.ADS1115()
-    GAIN = 8
+L = []
+L2 = []
+T = []
+FM = []
+FI = []
 
-    data = {
-        'Broadband': [],
-        'Time': [],
-        'Time2': [],
-        'Illuminance': [],
-        'Flicker': [],
-        'Time3': []
-        }
-    
-    program.run_server(debug=True)
+fi = 0
+fm = 0
+adc = Adafruit_ADS1x15.ADS1115()
+GAIN = 8
+
+data = {
+    'Broadband': [],
+    'Time': [],
+    'Time2': [],
+    'Illuminance': [],
+    'Flicker': [],
+    'Time3': []
+    }

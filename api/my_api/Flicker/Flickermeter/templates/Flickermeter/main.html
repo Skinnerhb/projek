@@ -1,4 +1,5 @@
 {% extends "Flickermeter/base.html" %}
+{% load plotly_dash %}
 {% block content %}
 	{% if user.is_authenticated %}
 		<div id="navbar">
@@ -10,13 +11,8 @@
 				</div>
 			</form>
 		</div>
-		<div id='some'>
-			<div id='charter'>
-				
-			</div>
-			<div id='labels'>
-				<p>some stuff</p>
-			</div>
+		<div class="{% plotly_class name='Main' %}" style="height:100%; width:100%">
+			{% plotly_app name='Main' ratio=0.65 %}
 		</div>
 	{% else %}
 		<div id="navbar">

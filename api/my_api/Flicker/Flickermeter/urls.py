@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
 from . import views
+from Flickermeter.dash_apps.woriking_apps import Main
 
 
 urlpatterns = [

@@ -132,15 +132,15 @@ CHANNEL_LAYERS = {
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.AppDirectoriesFinder',
-    'Flicker.finders.DashAssetFinder',
-    'Flicker.finders.DashComponentFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
     ]
 
 PLOTLY_COMPONENTS = [
     'dash_core_components',
     'dash_html_components',
-    'dash_render',
+    'dash_renderer',
     
     'dpd_components',
     ]
