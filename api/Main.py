@@ -217,7 +217,7 @@ program.layout = html.Div(
                     ),
                 dcc.Interval(
                     id='inter4',
-                    interval=1.17,
+                    interval=150,
                     n_intervals=0
                     ),
                 html.Label(id = 'prop')

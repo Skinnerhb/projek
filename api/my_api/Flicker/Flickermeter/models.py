@@ -14,6 +14,7 @@ class LightI(models.Model):
 class Data(models.Model):
     Broadband = models.FloatField()
     Infrared = models.FloatField()
+    VisibleLight = models.FloatField()
     Illuminance = models.FloatField()
     FlickerModulation = models.FloatField()
     FlickerIndex = models.FloatField()
