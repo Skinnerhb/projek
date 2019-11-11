@@ -12,7 +12,7 @@ import adafruit_tsl2561 as tsl
 from timeit import default_timer as timer
 import time
 import math
-import pandas as pd
+#import pandas as pd
 import sqlite3
 import Adafruit_ADS1x15
 from django.utils import timezone
@@ -68,37 +68,12 @@ program.layout = html.Div(
             #sub division with tabs
             children=[
                 html.Div(
-                    id ='blom',
-                    style= {
-                        'display': 'inline-block',
-                        },
-                    children = [
-                        html.Button('Start', id='sbutton', style={
-                            'background-color': 'rgb(159, 213, 200)', 
-                            'border': 'none',
-                            'text-align':'center',
-                            'text-decoration': 'none',
-                            'font-size': '24px',
-                            'padding-right':'20px'
-                            
-                            }),
-                        html.Button('Reset', id='pbutton', style={
-                            'background-color': 'rgb(159, 213, 200)', 
-                            'border': 'none',
-                            'text-align':'center',
-                            'text-decoration': 'none',
-                            'font-size': '24px',
-                            
-                            }),
-                        ]
-                    ),
-                html.Div(
                     #start sub flux division
                     style={
                         'backgroundColor': colorst['background'],
                         'font-size':'24px',
                         'display':'inline-block',
-                        'padding-left':'10%'
+                        'padding-left':'5%'
                         },
                     children=[
                         html.Label('  Enter distance from light source to device:  '),
@@ -123,7 +98,7 @@ program.layout = html.Div(
                         'font-size':'24px',
                         'display':'inline-block',
                         'width':'25%',
-                        'padding-left':'16%',
+                        'padding-left':'10%',
                         },
                     children = [
                         dcc.Dropdown(
@@ -149,6 +124,15 @@ program.layout = html.Div(
                     #end dropdown sub division
                     ),
                 html.Button('Save',id='sabutton', n_clicks = 0, style={
+                    'background-color': 'rgb(159, 213, 200)', 
+                    'border': 'none',
+                    'text-align':'center',
+                    'text-decoration': 'none',
+                    'display': 'inline-block',
+                    'font-size': '24px',
+                    'padding-left':'10px'
+                    }),
+                html.Button('Stop Saving',id='sasbutton', n_clicks = 0, style={
                     'background-color': 'rgb(159, 213, 200)', 
                     'border': 'none',
                     'text-align':'center',
@@ -217,10 +201,13 @@ program.layout = html.Div(
                                         'padding-left':'10px'
                                         }),
                                     html.Br(),
-                                    html.Div(id = 'lack', style = {
-                                        'text-align':'center',
-                                        'font-size':'24px'
-                                        }),
+                                    html.Div(
+                                        id = 'lack',
+                                        style = {
+                                            'text-align':'center',
+                                            'font-size':'24px'
+                                            },
+                                        )
                                     ],
                                 style = {
                                     'margin': '40px',
@@ -253,6 +240,32 @@ program.layout = html.Div(
                             label='Broadband',
                             value='tab-1',
                             children =[
+                                html.Div(
+                                    id ='blom1',
+                                    style= {
+                                        'display': 'inline-block',
+                                        },
+                                    children = [
+                                        html.Button('Start', id='sbutton1', style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            'padding-right':'20px'
+                                            
+                                            }),
+                                        html.Button('Reset', id='pbutton1', n_clicks = 0 , style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            
+                                            }),
+                                        ]
+                                    ),
+                                html.Br(),
                                 html.H2(
                                     children= 'Broadband measurent (nm)',
                                     style ={
@@ -276,6 +289,32 @@ program.layout = html.Div(
                             label='Illuminance',
                             value='tab-2',
                             children =[
+                                html.Div(
+                                    id ='blom2',
+                                    style= {
+                                        'display': 'inline-block',
+                                        },
+                                    children = [
+                                        html.Button('Start', id='sbutton2', style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            'padding-right':'20px'
+                                            
+                                            }),
+                                        html.Button('Reset', id='pbutton2', n_clicks = 0 , style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            
+                                            }),
+                                        ]
+                                    ),
+                                html.Br(),
                                 html.H2(
                                     children= 'Illuminance measurent (lx)',
                                     style ={
@@ -299,6 +338,32 @@ program.layout = html.Div(
                             label='Flicker',
                             value='tab-3',
                             children =[
+                                html.Div(
+                                    id ='blom3',
+                                    style= {
+                                        'display': 'inline-block',
+                                        },
+                                    children = [
+                                        html.Button('Start', id='sbutton3', style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            'padding-right':'20px'
+                                            
+                                            }),
+                                        html.Button('Reset', id='pbutton3', n_clicks = 0 , style={
+                                            'background-color': 'rgb(159, 213, 200)', 
+                                            'border': 'none',
+                                            'text-align':'center',
+                                            'text-decoration': 'none',
+                                            'font-size': '24px',
+                                            
+                                            }),
+                                        ]
+                                    ),
+                                html.Br(),
                                 html.H2(
                                     children= 'Flicker measurent (%)',
                                     style ={
@@ -324,6 +389,11 @@ program.layout = html.Div(
                 ]
             #end tab division
             ),
+        dcc.Interval(
+            id = 'inter5',
+            interval = 500,
+            n_intervals = 0
+            ),
         html.Div(id='Datastore',
                  style = {'display':'none'},
                  children = [
@@ -332,7 +402,6 @@ program.layout = html.Div(
                          interval = 500,
                          n_intervals = 0
                          ),
-            html.Div(id ='GetDatas'),
             
             ]),
         ]
@@ -343,19 +412,277 @@ program.layout = html.Div(
 ##############################################################Tab Layout with Callbacks##################################################################################
 #######################################################################################################################################################
 
-#save button callback
-#@program.callback(
- #   Output('save_con','children'),
-  #  [Input('Sbut','n_clicks')],
-  #  [State('LID','value')]
-   # )
-#def upout(n_clicks, value):
- #   return 'clicks: {}, ID: "{}"'.format(
-  #      n_clicks,
-   #     value
-    #    )
 
-def datacon(dist,tslll,adcc):
+# def datacon(dist,tslll,adcc):
+#     A1 = 0
+#     A2 = 0
+#     Pm = 0
+#     Pi = 0
+#     fi = 0
+#     Pltm = 0
+#     total = 0
+#     broadband = tslll.broadband
+#     infrared = tslll.infrared
+#     
+#     visible_light = broadband - infrared
+#     
+#     end3 = timer()
+#     t3 = end3 - start
+#     
+#     if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+#         plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+#     elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+#         plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+#     elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+#         plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+#     elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+#         plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+#     else:
+#         plux = 0
+#         
+#     timeD['T'].append(t3)
+#     T = timeD['T']
+#     slux = adcc.read_adc(0, gain=GAIN)
+#     timeD['L'].append(slux)
+#     L = timeD['L']
+#     fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
+#     ave = np.average(L)
+#     if len(L)>1:
+#         for values in range(len(L)-1):
+#             xx = T[values+1] - T[values]
+#             checkers = (L[values + 1]+L[values])/2
+#             total += xx*(checkers)
+#             if checkers > ave:
+#                 A1 += xx*((checkers)-ave)
+#                 
+#         A2 = total - A1
+#         fi = (A1/(A1+A2))
+#         timeD['FM'].append(fm)
+#         FM = timeD['FM']
+#         timeD['FI'].append(fi)
+#         FI = timeD['FI']
+#         
+#         for lf in range(len(FM)):
+#             Pm += FM[lf] ** 3
+#             Pi += FI[lf] ** 3
+#             
+#         Pltm = math.pow(Pm/len(FM),1/3)
+#         #Plti = math.pow(Pi/len(FI),1/3)
+#     
+#     if dist is not None:
+#         try:
+#             cd = plux*(float(dist)**2)
+#             ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+#     
+#             flux = cd*ster
+#         except:
+#             cd = 0
+#             ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+#     
+#             flux = cd*ster
+#     else:
+#         cd = 0
+#         ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+# 
+#         flux = cd*ster
+#     return infrared,broadband,visible_light,t3,plux,flux,fm,fi,cd,Pltm
+
+@program.callback(
+    Output('popup1','style'),
+    [Input('sabutton','n_clicks'),
+     Input('inter5','n_intervals')]
+    )
+def savingly(nn, n):
+    if nn is not None:
+        if (nn % 2) == 1:
+            return {'display':'block'}
+        else:
+            return {'display':'none'}
+
+@program.callback(
+    Output('sabutton','n_clicks'),
+    [Input('closebutton','n_clicks')]
+    )
+def closesav(nc):
+    if nc:
+        return 0
+
+
+@program.callback(
+    Output('closebutton','n_clicks'),
+    [Input('lack','children'),
+     Input('inter4','n_intervals'),
+     Input('lighterid','value'),
+     Input('fli','value')
+     ]
+    )
+def savingly33(dat,n,litd,dist):
+    if dat == 'Saving started':
+        timeD['start4'].append(timer())
+        end = timer()
+        ti = end - timeD['start4'][0]
+        A1 = 0
+        A2 = 0
+        Pm = 0
+        Pi = 0
+        fi = 0
+        Pltm = 0
+        total = 0
+        broadband = tsll.broadband
+        infrared = tsll.infrared
+        
+        visible_light = broadband - infrared
+        
+        end3 = timer()
+        t3 = end3 - start
+        
+        if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+            plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+        elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+            plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+            plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+            plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+        else:
+            plux = 0
+            
+        timeD['T'].append(t3)
+        T = timeD['T']
+        slux = adc.read_adc(0, gain=GAIN)
+        timeD['L'].append(slux)
+        L = timeD['L']
+        fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
+        ave = np.average(L)
+        if len(L)>1:
+            for values in range(len(L)-1):
+                xx = T[values+1] - T[values]
+                checkers = (L[values + 1]+L[values])/2
+                total += xx*(checkers)
+                if checkers > ave:
+                    A1 += xx*((checkers)-ave)
+                    
+                A2 = total - A1
+                fi = (A1/(A1+A2))
+                timeD['FM2'].append(fm)
+                FM = timeD['FM2']
+                timeD['FI2'].append(fi)
+                FI = timeD['FI2']
+                
+                for lf in range(len(FM)):
+                    Pm += FM[lf] ** 3
+                    Pi += FI[lf] ** 3
+                    
+                Pltm = math.pow(Pm/len(FM),1/3)
+                #Plti = math.pow(Pi/len(FI),1/3)
+            
+            if dist is not None:
+                try:
+                    cd = plux*(float(dist)**2)
+                    ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+            
+                    flux = cd*ster
+                except:
+                    cd = 0
+                    ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+            
+                    flux = cd*ster
+            else:
+                cd = 0
+                ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
+
+                flux = cd*ster
+        try:
+            db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
+            con = connection(db)
+            q = con.cursor()
+            query2 = "INSERT INTO Flickermeter_data (Broadband, Infrared, VisibleLight, Illuminance, FlickerModulation, FlickerIndex, LongFlickerModulation, LongFlickerIndex, Luminance, Flux, Time, LightID_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            q.execute(query2, (broadband,infrared,visible_light,plux,fm,fi,Pltm,0,flux,cd,ti,litd))
+            con.commit()
+            close_con(con)
+            return 0
+        except con.Error as e:
+            print(e)
+            close_con(con)
+            return 0
+        
+    
+@program.callback(
+    Output('lack','children'),
+    [Input('confirmbutton','n_clicks'),
+     Input('userna','value'),
+     Input('lighterid','value'),
+     Input('lightertype','value'),
+     Input('sasbutton','n_clicks')
+     ]
+    )
+def savingly2(nn1,userss,lid,lty,nn2):
+    if nn2:
+        return 'Saving Stopped'
+        
+    if nn1:
+        print('entered')
+        db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
+        con = connection(db)
+        q = con.cursor()
+        try:
+            query = "SELECT id FROM auth_user WHERE username = ?"
+            q.execute(query, (userss,))
+            useri = q.fetchone()
+            if useri is not None:
+                userii = useri[0]
+                close_con(con)
+                try:
+                    db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
+                    con = connection(db)
+                    q = con.cursor()
+                    query3 = "SELECT LightID FROM Flickermeter_lighti WHERE UserID_id = ?"
+                    q.execute(query3, (lid,))
+                    lidd = q.fetchone()
+                    if lidd is not None:
+                        close_con(con)
+                        return 'Light ID already exists'
+                    else:
+                        close_con(con)
+                        try:                            
+                            db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
+                            con = connection(db)
+                            q = con.cursor()
+                            if lid is not None and lty is not None:
+                                timen = timezone.now()
+                                query2 = "INSERT INTO Flickermeter_lighti (LightID, LightType, date_created, UserID_id) VALUES (?, ?, ?, ?)"
+                                q.execute(query2, (lid,lty,timen,userii))
+                                con.commit()
+                                close_con(con)
+                                return 'Saving started'
+                            else:
+                                print('Light ID or light type not entered')
+                                return 'Light ID or light type not entered'
+                        except con.Error as e:
+                            print(e)
+                            close_con(con)
+                            return e
+                except con.Error as e:
+                    print(e)
+                    close_con(con)
+                    return e
+            else:
+                print('username not entered')
+                return 'Username not entered'
+        except con.Error as e:
+            print(e)
+            close_con(con)
+            return e
+
+
+#dropdown control
+@program.callback(
+    Output('prop','children'),
+    [Input('property','value'),
+     Input('fli','value')
+    ]
+    )
+def update_label(value, dist):
     A1 = 0
     A2 = 0
     Pm = 0
@@ -363,8 +690,8 @@ def datacon(dist,tslll,adcc):
     fi = 0
     Pltm = 0
     total = 0
-    broadband = tslll.broadband
-    infrared = tslll.infrared
+    broadband = tsll.broadband
+    infrared = tsll.infrared
     
     visible_light = broadband - infrared
     
@@ -382,11 +709,11 @@ def datacon(dist,tslll,adcc):
     else:
         plux = 0
         
-    timeD['T'].append(t3)
-    T = timeD['T']
-    slux = adcc.read_adc(0, gain=GAIN)
-    timeD['L'].append(slux)
-    L = timeD['L']
+    timeD['T2'].append(t3)
+    T = timeD['T2']
+    slux = adc.read_adc(0, gain=GAIN)
+    timeD['L2'].append(slux)
+    L = timeD['L2']
     fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
     ave = np.average(L)
     if len(L)>1:
@@ -399,10 +726,10 @@ def datacon(dist,tslll,adcc):
                 
         A2 = total - A1
         fi = (A1/(A1+A2))
-        timeD['FM'].append(fm)
-        FM = timeD['FM']
-        timeD['FI'].append(fi)
-        FI = timeD['FI']
+        timeD['FM2'].append(fm)
+        FM = timeD['FM2']
+        timeD['FI2'].append(fi)
+        FI = timeD['FI2']
         
         for lf in range(len(FM)):
             Pm += FM[lf] ** 3
@@ -427,131 +754,6 @@ def datacon(dist,tslll,adcc):
         ster = 2*math.pi*(1-math.cos((35*math.pi)/(180)))
 
         flux = cd*ster
-    return infrared,broadband,visible_light,t3,plux,flux,fm,fi,cd,Pltm
-
-
-@program.callback(
-    Output('popup1','style'),
-    [Input('sabutton','n_clicks')]
-    )
-def savingly(nn):
-    if (nn % 2) == 1:
-        return {'display':'block'}
-    else:
-        return {'display':'none'}
-    
-    
-@program.callback(
-    Output('lack','children'),
-    [Input('confirmbutton','n_clicks'),
-     Input('userna','value'),
-     Input('lighterid','value'),
-     Input('lightertype','value')
-     ]
-    )
-def savingly2(nn1,userss,lid,lty):
-    if nn1:
-        print('entered')
-        db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
-        con = connection(db)
-        q = con.cursor()
-        try:
-            query = "SELECT id FROM auth_user WHERE username = ?"
-            q.execute(query, (userss,))
-            useri = q.fetchone()
-            if useri is not None:
-                userii = useri[0]
-                close_con(con)
-                try:
-                    db = '/home/pi/projek/api/my_api/Flicker/db.sqlite3'
-                    con = connection(db)
-                    q = con.cursor()
-                    if lid is not None and lty is not None:
-                        timen = timezone.now()
-                        query2 = "INSERT INTO Flickermeter_lighti (LightID, LightType, date_created, UserID_id) VALUES (?, ?, ?, ?)"
-                        q.execute(query2, (lid,lty,timen,userii))
-                        con.commit()
-                        close_con(con)
-                        return 'Saving started'
-                    else:
-                        print('Light ID or light type not entered')
-                        return 'Light ID or light type not entered'
-                except con.Error as e:
-                    print(e)
-                    close_con(con)
-                    return e
-            else:
-                print('username not entered')
-                return 'Username not entered'
-        except con.Error as e:
-            print(e)
-            close_con(con)
-            return e
-
-@program.callback(
-    Output('sabutton','n_clicks'),
-    [Input('closebutton','n_clicks')]
-    )
-def closesav(nc):
-    if nc:
-       return 0 
-
-
-@program.callback(
-    Output('GetDatas','children'),
-    [Input('inter4','n_intervals'),
-     Input('fli','value'),
-     ]
-    )
-def datacomp(n,dist):
-    
-    [infrared,broadband,visible_light,t3,plux,flux,fm,fi,cd,Pltm] = datacon(dist,tsll,adc)
-    
-    data['Infrared'].append(infrared)
-    data['Time'].append(t3)
-    data['Broadband'].append(broadband)
-    data['VisibleLight'].append(visible_light)
-    data['Illuminance'].append(plux)
-    data['FlickerModulation'].append(fm)
-    data['FlickerIndex'].append(fi)
-    data['LongTermFlicker'].append(Pltm)
-    data['Flux'].append(flux)
-    data['Intensity'].append(cd)
-        
-    df2 = pd.DataFrame({'Infrared':data['Infrared'],
-                        'Time':data['Time'],
-                        'Broadband':data['Broadband'],
-                        'VisibleLight':data['VisibleLight'],
-                        'Illuminance':data['Illuminance'],
-                        'FlickerModulation':data['FlickerModulation'],
-                        'FlickerIndex':data['FlickerIndex'],
-                        'LongTermFlicker':data['LongTermFlicker'],
-                        'Flux':data['Flux'],
-                        'Intensity':data['Intensity']})
-    
-    collec = df2.to_json('catch')
-        
-    return collec
-
-#dropdown control
-@program.callback(
-    Output('prop','children'),
-    [Input('property','value'),
-     Input('GetDatas','children')
-    ]
-    )
-def update_label(value, datas):
-    
-    df3 = pd.read_json('catch')
-    infrared = df3['Infrared'].iloc[-1]
-    broadband = df3['Broadband'].iloc[-1]
-    visible_light = df3['VisibleLight'].iloc[-1]
-    plux = df3['Illuminance'].iloc[-1]
-    fm = df3['FlickerModulation'].iloc[-1]
-    fi = df3['FlickerIndex'].iloc[-1]
-    Pltm = df3['LongTermFlicker'].iloc[-1]
-    flux = df3['Flux'].iloc[-1]
-    cd = df3['Intensity'].iloc[-1]
     
     if value == 'nm':
         return '{} nm'.format(broadband)
@@ -590,21 +792,19 @@ def showcont(tab):
 @program.callback(
     Output('graph-1','figure'),
     [Input('inter','n_intervals'),
-     Input('sbutton','n_clicks'),
-     Input('GetDatas','children')
+     Input('sbutton1','n_clicks')
      ]
     )
-def update_graph1(n,nn1,datas):
-    df3 = pd.read_json('catch')
-    
+def update_graph1(n,nn1):    
     if nn1 is None or nn1 == 0:
+        broadband = tsll.broadband
         timeD['Time2'].clear()
         timeD['Time2'].append(0)
         timeD['n3'].clear()
         timeD['n3'].append(0)
         timeD['start1'].clear()
         timeD['BnD'].clear()
-        timeD['BnD'].append(df3['Broadband'].iloc[-1])
+        timeD['BnD'].append(broadband)
         return {
             'data':[{
                 'type':'scatter',
@@ -631,6 +831,7 @@ def update_graph1(n,nn1,datas):
             }
     
     if nn1 is not None and nn1 >= 1:
+        broadband = tsll.broadband
         if timeD['n3'][0] == 0:
             timeD['start1'].append(timer())
             timeD['n3'][0] = 1
@@ -639,7 +840,7 @@ def update_graph1(n,nn1,datas):
         elif timeD['n3'][0] == 1:
             end = timer()
             timeD['Time2'].append(end-timeD['start1'][0])
-            timeD['BnD'].append(df3['Broadband'].iloc[-1])
+            timeD['BnD'].append(broadband)
             
             if timeD['Time2'][-1] < 20:
                 return {
@@ -693,31 +894,57 @@ def update_graph1(n,nn1,datas):
                     }
 
 @program.callback(
-    Output('sbutton','n_clicks'),
-    [Input('pbutton','n_clicks'),
+    Output('sbutton1','n_clicks'),
+    [Input('pbutton1','n_clicks')
      ]
     )
-def resetgraphs(n):
+def resetgraphs1(n):
+    return 0
+
+@program.callback(
+    Output('sbutton2','n_clicks'),
+    [Input('pbutton2','n_clicks')
+     ]
+    )
+def resetgraphs2(n):
+    return 0
+
+@program.callback(
+    Output('sbutton3','n_clicks'),
+    [Input('pbutton3','n_clicks')
+     ]
+    )
+def resetgraphs3(n):
     return 0
 
 #update Illuminance graph
 @program.callback(
     Output('graph-2','figure'),
     [Input('inter2','n_intervals'),
-     Input('sbutton','n_clicks'),
-     Input('GetDatas','children')]
+     Input('sbutton2','n_clicks')]
     )
-def update_graph2(n,nn1,datas):
-    df3 = pd.read_json('catch')
-    
+def update_graph2(n,nn1):
     if nn1 is None or nn1 == 0:
+        broadband = tsll.broadband
+        infrared = tsll.infrared
+        if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+            plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+        elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+            plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+            plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+            plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+        else:
+            plux = 0
+            
         timeD['Time3'].clear()
         timeD['Time3'].append(0)
         timeD['n4'].clear()
         timeD['n4'].append(0)
         timeD['start2'].clear()
         timeD['LnD'].clear()
-        timeD['LnD'].append(df3['Illuminance'].iloc[-1])
+        timeD['LnD'].append(plux)
         return {
             'data':[{
                 'type':'scatter',
@@ -744,6 +971,18 @@ def update_graph2(n,nn1,datas):
             }
     
     if nn1 is not None and nn1 >= 1:
+        broadband = tslll.broadband
+        infrared = tslll.infrared
+        if(infrared/broadband <= 0.50 and infrared/broadband > 0):
+            plux = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)
+        elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):
+            plux = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):
+            plux = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)
+        elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):
+            plux = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)
+        else:
+            plux = 0
         if timeD['n4'][0] == 0:
             timeD['start2'].append(timer())
             timeD['n4'][0] = 1
@@ -752,7 +991,7 @@ def update_graph2(n,nn1,datas):
         elif timeD['n4'][0] == 1:
             end = timer()
             timeD['Time3'].append(end-timeD['start2'][0])
-            timeD['LnD'].append(df3['Illuminance'].iloc[-1])
+            timeD['LnD'].append(plux)
             
             if timeD['Time3'][-1] < 20:
                 return {
@@ -809,21 +1048,22 @@ def update_graph2(n,nn1,datas):
 @program.callback(
     Output('graph-3','figure'),
     [Input('inter3','n_intervals'),
-     Input('sbutton','n_clicks'),
-     Input('GetDatas','children')
+     Input('sbutton3','n_clicks')
      ]
     )
-def update_graph3(n,nn1,datas):
-    df3 = pd.read_json('catch')
-    
+def update_graph3(n,nn1):
     if nn1 is None or nn1 == 0:
+        slux = adc.read_adc(0, gain=GAIN)
+        timeD['L'].append(slux)
+        L = timeD['L']
+        fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
         timeD['Time4'].clear()
         timeD['Time4'].append(0)
         timeD['n5'].clear()
         timeD['n5'].append(0)
         timeD['start3'].clear()
         timeD['FnD'].clear()
-        timeD['FnD'].append(df3['FlickerModulation'].iloc[-1])
+        timeD['FnD'].append(fm)
         return {
             'data':[{
                 'type':'scatter',
@@ -850,6 +1090,10 @@ def update_graph3(n,nn1,datas):
             }
     
     if nn1 is not None and nn1 >= 1:
+        slux = adcc.read_adc(0, gain=GAIN)
+        timeD['L'].append(slux)
+        L = timeD['L']
+        fm = ((np.max(L)-np.min(L))/(np.max(L)+np.min(L)))*100
         if timeD['n5'][0] == 0:
             timeD['start3'].append(timer())
             timeD['n5'][0] = 1
@@ -858,7 +1102,7 @@ def update_graph3(n,nn1,datas):
         elif timeD['n5'][0] == 1:
             end = timer()
             timeD['Time4'].append(end-timeD['start3'][0])
-            timeD['FnD'].append(df3['FlickerModulation'].iloc[-1])
+            timeD['FnD'].append(fm)
             
             if timeD['Time4'][-1] < 20:
                 return {
@@ -912,22 +1156,6 @@ def update_graph3(n,nn1,datas):
                     }
 
 #######################################################################################################################################################
-##############################################################SQL functions##################################################################################
-#######################################################################################################################################################
-
-#def save(broadband,infrared,VisibleLight,plux,fm,fi,pm,pi,flux, inten,t):
- #   con = connection('Light_test.db')
-  #  q = con.cursor()
-   # try:
-    #    query = "INSERT INTO Lights (Light_Type, Broadband, Infrared, Visible_Light, Illuminance, Flicker_Modulation, Flicker_Index, Long_Modulation, Long_Index, Flux, Intensity, Time)) VALUES ('LED',?,?,?,?,?,?,?,?,?,?,?);"
-     #   q.execute(query, (broadband,infrared,VisibleLight,plux,fm,fi,pm, pi,flux, inten,t))
-      #  con.commit()
-       # close_con(con)
-    #except con.Error as e:
-     #   print(e)
-      #  close_con(con)
-
-#######################################################################################################################################################
 ##############################################################Start Program and Threads##################################################################################
 #######################################################################################################################################################
 
@@ -962,8 +1190,6 @@ start = timer()
 
 adc = Adafruit_ADS1x15.ADS1115()
 GAIN = 8
-n1 = 0
-n2 = 0
 
 
 data = {
@@ -992,9 +1218,14 @@ timeD = {
     'start1': [],
     'start2': [],
     'start3': [],
+    'start4':[],
     'L' : [],
     'T' : [],
     'FM' : [],
     'FI' : [],
+    'L2' : [],
+    'T2' : [],
+    'FM2' : [],
+    'FI2' : [],
     }
 

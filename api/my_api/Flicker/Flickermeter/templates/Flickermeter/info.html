@@ -3,4 +3,58 @@
 	<div id="navbar">
 		<h1>Information</h1>
 	</div>
+	<div class="tab">
+		<button class="tablink" onclick="infor(event, 'General')">General</button>
+		<button class="tablink" onclick="infor(event, 'Saving')">Saving</button>
+		<button class="tablink" onclick="infor(event, 'Calculations')">Calculations</button>
+		<button class="tablink" onclick="infor(event, 'Accessing_data')">Access Database</button>
+	</div>
+	<div id="General" class="tabcontent">
+		<h1>General</h1>
+		<p>This application is written in with a django_dash_plotly framework.</p><br>
+		<p>The application is used to reproduce the human eye response to electrical light sources where there is no natural light.</p><br>
+		<p>Hardware used:</p>
+		<ol>
+			<li>TSL2561 lux sensor</li>
+			<li>TSL257 light to voltage sensor</li>
+			<li>ADS1115 analog to digital convertion</li>
+			<li>Raspberry Pi model 3 B+</li>
+		</ol>
+	</div>
+	<div id="Saving" class="tabcontent">
+		<h1>Saving</h1>
+		<p>It is advised to save while the charts are not active, the application runs on different threads, the Raspberry Pi model 3 B+ has 1GB RAM. The program might lag when the chart is collecting data.</p><br>
+		<p>To save luminous flux and luminous intesity values, distance to light source must be entered.</p><br>
+		<p>The application will not save data if username, light ID, and type is not entered.</p>
+	</div>
+	<div id="Calculations" class="tabcontent">
+		<h1>Calculations</h1>
+		<p>The light wavelenght for broadband and infrared is measured through the TSL2561.</p><br>
+		<p>The Illuminance measured in lux is calculated with the following equation:</p><br>
+		<p>if(infrared/broadband <= 0.50 and infrared/broadband > 0):<br>
+            illuminance = ( (0.0304*(broadband/(2**10))) - ((0.062*(broadband/(2**10)))*((infrared/broadband)**1.4)))*(2**14)<br>
+        elif(infrared/broadband <= 0.61 and infrared/broadband > 0.50):<br>
+            illuminance = ( (0.0224*(broadband/(2**10))) - (0.031*(infrared/(2**10))))*(2**14)<br>
+        elif(infrared/broadband <= 0.80 and infrared/broadband > 0.61):<br>
+            illuminance = ( (0.0128*(broadband/(2**10))) - (0.0153*(infrared/(2**10))))*(2**14)<br>
+        elif(infrared/broadband <= 1.3 and infrared/broadband > 0.80):<br>
+            illuminance = ( (0.00146*(broadband/(2**10))) - (0.00112*(infrared/(2**10))))*(2**14)<br>
+        else:<br>
+            illuminance = 0</p><br>
+		<p>Flux was calculated using the following equation:</p>
+		<p>Sterillium = 2*pi*(1-cos((35*pi)/(180)))</p><br>
+		<p>Luminance or luminous intensity are calculated using the following equation:</p>
+		<p>Intensity = illuminance*(dist**2)</p><br>
+		<p>Sterillium is calculated using the following equation:</p>
+		<p>Sterillium = 2*pi*(1-cos((35*pi)/(180)))</p><br>
+		<p>Attenuated light is measured using a TSL257 light to voltage converter:</p><br>
+		<p>Flicker modulation is calculated using the following equation:</p>
+		<p>Flicker modulation % = ((max(attenuated light)-min(attenuated light))/(max(attenuated light)+min(attenuated light)))*100</p><br>
+	</div>
+	<div id="Accessing_data" class="tabcontent">
+		<h1>Access Database</h1>
+		<p>Users with administration permissions can be accessed from the URL https://127.0.0.1:8000/admin </p>
+		<p>Otherwise, the source code and database can be downloaded from https://github.com/Skinnerhb/projek.git </p>
+		<p>More information can be found in the README file on github.</p>
+	</div>
 {% endblock content %}
